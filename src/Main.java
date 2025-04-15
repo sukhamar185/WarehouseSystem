@@ -7,77 +7,84 @@ public class Main {
         Storekeeper storekeeper = new Storekeeper("Nyraw 1", warehouse);
         warehouse.setStorekeeper(storekeeper);
 
-        // Бараа үүсгэх
-        Item item1 = new Item("Baraa 1", 100);
-        Item item2 = new Item("Baraa 2", 50);
-
         // Барааны жагсаалт
         List<Item> items = new ArrayList<>();
-        items.add(item1);
-        items.add(item2);
+        items.add(new Item("Baraa 1", 100));
+        items.add(new Item("Baraa 2", 50));
 
-        // Үйлдлийн цэс
         while (true) {
             System.out.println("\nVildel songono uu:");
-            System.out.println("1. Baraa hvleen awah");
-            System.out.println("2. Baraa zarlagdah");
-            System.out.println("3. Toollogo hiih");
-            System.out.println("4. Nuutsiin tailan harah");
+            System.out.println("1. Baraa nemeh");
+            System.out.println("2. Baraa hvleen awah");
+            System.out.println("3. Baraa zarlagdah");
+            System.out.println("4. Toollogo hiih");
+            System.out.println("5. Nuutsiin tailan harah");
             System.out.println("0. Garah");
 
             int choice = scanner.nextInt();
-            scanner.nextLine();  // Buffer цэвэрлэх
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
-                    // Бараа хүлээн авах
-                    System.out.println("Baraanii neriig songono uu:");
-                    for (int i = 0; i < items.size(); i++) {
-                        System.out.println((i + 1) + ". " + items.get(i).getName());
-                    }
-                    int itemChoice = scanner.nextInt();
-                    System.out.println("Toog oruulana uu:");
-                    int quantity = scanner.nextInt();
-                    StockReceipt stockReceipt = new StockReceipt(items.get(itemChoice - 1), quantity);
-                    System.out.println(stockReceipt);
+                    System.out.println("Shine baraanii neriig oruulna uu:");
+                    String newName = scanner.nextLine();
+                    System.out.println("Toog oruulna uu:");
+                    int newQty = scanner.nextInt();
+                    items.add(new Item(newName, newQty));
+                    System.out.println("Baraa amjilttai nemegdlee.");
                     break;
                 case 2:
-                    // Бараа зарлагадах
-                    System.out.println("Baraanii neriig songono uu:");
-                    for (int i = 0; i < items.size(); i++) {
-                        System.out.println((i + 1) + ". " + items.get(i).getName());
-                    }
-                    itemChoice = scanner.nextInt();
+                    Item selectedReceiptItem = selectItem(scanner, items);
                     System.out.println("Toog oruulana uu:");
-                    quantity = scanner.nextInt();
-                    StockIssue stockIssue = new StockIssue(items.get(itemChoice - 1), quantity);
-                    System.out.println(stockIssue);
+                    int receiptQty = scanner.nextInt();
+                    selectedReceiptItem.setQuantity(selectedReceiptItem.getQuantity() + receiptQty);
+                    StockReceipt receipt = new StockReceipt(selectedReceiptItem, receiptQty);
+                    System.out.println(receipt);
                     break;
                 case 3:
-                    // Тооллого хийх
-                    System.out.println("Baraanii neriig songono uu:");
-                    for (int i = 0; i < items.size(); i++) {
-                        System.out.println((i + 1) + ". " + items.get(i).getName());
+                    Item selectedIssueItem = selectItem(scanner, items);
+                    System.out.println("Toog oruulana uu:");
+                    int issueQty = scanner.nextInt();
+                    if (issueQty > selectedIssueItem.getQuantity()) {
+                        System.out.println("Aldaa: Hangalttai baraa baihgui!");
+                    } else {
+                        selectedIssueItem.setQuantity(selectedIssueItem.getQuantity() - issueQty);
+                        StockIssue issue = new StockIssue(selectedIssueItem, issueQty);
+                        System.out.println(issue);
                     }
-                    itemChoice = scanner.nextInt();
-                    System.out.println("Bodit too hemjeeg oruulana uu:");
-                    int actualQuantity = scanner.nextInt();
-                    Stocktaking stocktaking = new Stocktaking(items.get(itemChoice - 1), actualQuantity);
-                    System.out.println(stocktaking);
                     break;
                 case 4:
-                    // Нөөцийн тайлан харах
-                    System.out.println("Niit vildegdel: " + items.get(0).getQuantity() + ", " + items.get(1).getQuantity());
+                    Item selectedCountItem = selectItem(scanner, items);
+                    System.out.println("Bodit too hemjeeg oruulana uu:");
+                    int actualQty = scanner.nextInt();
+                    selectedCountItem.setQuantity(actualQty);
+                    Stocktaking stocktaking = new Stocktaking(selectedCountItem, actualQty);
+                    System.out.println(stocktaking);
+                    break;
+                case 5:
+                    System.out.println("Nuutsiin tailan:");
+                    for (Item item : items) {
+                        System.out.println(item.getName() + " - Too hemjee: " + item.getQuantity());
+                    }
                     break;
                 case 0:
-                    // Гарах
                     System.out.println("System-ees garlaa.");
-                    scanner.close();  // Scanner-ийг хаах
+                    scanner.close();
                     return;
                 default:
-                    System.out.println("Butsaaj oroldono uu.");
+                    System.out.println("Buruu songolt. Dahin oroldono uu.");
                     break;
             }
         }
+    }
+
+    private static Item selectItem(Scanner scanner, List<Item> items) {
+        System.out.println("Baraanii neriig songono uu:");
+        for (int i = 0; i < items.size(); i++) {
+            System.out.println((i + 1) + ". " + items.get(i).getName());
+        }
+        int itemChoice = scanner.nextInt();
+        scanner.nextLine();
+        return items.get(itemChoice - 1);
     }
 }
